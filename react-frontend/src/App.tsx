@@ -7,7 +7,12 @@ function App() {
   return (
     <MuiThemeProvider theme={theme}>
       <SnackbarProvider maxSnack={3}>
-        <CssBaseline />
+        {/* 
+          Por mais que o MuiThemeProvider consiga alterar informações visuais do proprio Mui,
+            Precisamos do CssBaseLine pra poder aplicar mais informações, de forma mais efetiva.
+            Ex: Background Color...
+        */}
+        <CssBaseline /> 
         <Mapping />
       </SnackbarProvider>
     </MuiThemeProvider>

@@ -19,7 +19,7 @@ import io from "socket.io-client";
 
 const API_URL = process.env.REACT_APP_API_URL as string;
 
-const googleMapsLoader = new Loader(process.env.REACT_APP_GOOGLE_API_KEY);
+const googleMapsLoader = new Loader(process.env.REACT_APP_GOOGLE_API_KEY); // Nosso serviç odo Google.
 
 const colors = [
   "#b71c1c",
@@ -54,8 +54,11 @@ const useStyles = makeStyles({
 
 export const Mapping: FunctionComponent = () => {
   const classes = useStyles();
+  // Rotas do Nest.js.
   const [routes, setRoutes] = useState<Route[]>([]);
+  // Pra guardar a rota selecionada pelo Cliente.
   const [routeIdSelected, setRouteIdSelected] = useState<string>("");
+  // A Referência do nosso mapa.
   const mapRef = useRef<Map>();
   const socketIORef = useRef<SocketIOClient.Socket>();
   const { enqueueSnackbar } = useSnackbar();
@@ -69,7 +72,7 @@ export const Mapping: FunctionComponent = () => {
     },
     [enqueueSnackbar]
   );
-
+  // Quando o componente for iniciado pela primeira vez.
   useEffect(() => {
     if (!socketIORef.current?.connected) {
       socketIORef.current = io.connect(API_URL);
@@ -97,19 +100,28 @@ export const Mapping: FunctionComponent = () => {
     };
   }, [finishRoute, routes, routeIdSelected]);
 
+  // Quando o componente for iniciado pela primeira vez.
   useEffect(() => {
+    // Para carregarmos as rotas disponíveis.
     fetch(`${API_URL}/routes`)
       .then((data) => data.json())
       .then((data) => setRoutes(data));
   }, []);
 
-  useEffect(() => {
-    (async () => {
+  // Quando o componente for iniciado pela primeira vez.
+  useEffect(() => { 
+    (async () => { // Precisa ser async pra dar tempo do Google carregar o mapa.
+
+      // Como recebemos um Array com o resultado das promessas, ignoramos o primeiro (quem não vem nada do google) e usamos o segundo.
       const [, position] = await Promise.all([
-        googleMapsLoader.load(),
-        getCurrentPosition({ enableHighAccuracy: true }),
+        googleMapsLoader.load(), // Para iniciarmos o Mapa do Google.
+        getCurrentPosition({ enableHighAccuracy: true }), // Para pegar a geolocalização do Browser.
       ]);
+
+      // Div pra montar o Mapa.
       const divMap = document.getElementById("map") as HTMLElement;
+
+      // Com a div e a referencia do mapa, assim que as promessas forem cumpridas, preenchemos uma posição inicial.
       mapRef.current = new Map(divMap, {
         zoom: 15,
         center: position,
@@ -117,9 +129,10 @@ export const Mapping: FunctionComponent = () => {
     })();
   }, []);
 
-  const startRoute = useCallback(
+  //Evento que inicia a Rota.
+  const startRoute = useCallback( // Define que a função só será gerada, quando as propriedades de dependência mudarem seu estado.
     (event: FormEvent) => {
-      event.preventDefault();
+      event.preventDefault(); // Cancelando a submissão para não recarregar a página.
       const route = routes.find((route) => route._id === routeIdSelected);
       const color = sample(shuffle(colors)) as string;
       try {

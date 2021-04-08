@@ -1,3 +1,4 @@
+// Para pegar a geolocalização do Browser.
 export function getCurrentPosition(
   options?: PositionOptions
 ): Promise<{ lat: number; lng: number }> {
